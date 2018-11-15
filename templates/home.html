@@ -1,2 +1,39 @@
 {% extends "layout.html" %}
 {% block title %}Home Stack Overflow Lite{% endblock %}
+{%block content%}
+<div class="mb-4">
+  <a href="{{ url_for('new_question') }}" class="btn btn-primary">Ask Question</a>
+</div>
+
+<table class="table table-striped mb-4">
+  <thead class="thead-inverse">
+    <tr>
+      <th>Topic</th>
+      <th>Starter</th>
+      <th>Replies</th>
+      <th>Views</th>
+      <th>Last Update</th>
+    </tr>
+  </thead>
+  <tbody>
+
+
+      <tr>
+        <td>
+          <p class="mb-0">
+            <a href=""></a>
+          </p>
+          <small class="text-muted">
+
+
+          </small>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+
+  </tbody>
+</table>
+{% endblock %}
