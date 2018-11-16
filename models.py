@@ -31,8 +31,8 @@ class Question(db.Model):
     qid = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(80), nullable = False)
     body = db.Column(db.Text, nullable = False)
-    date_posted = db.Column(db.DateTime, nullable = False, default=datetime.datetime.utcnow())
-    last_updated = db.Column(db.DateTime, nullable = False, default=datetime.datetime.utcnow())
+    date_posted = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
+    last_updated = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
     starter = db.Column(db.Integer, db.ForeignKey('users.uid'))
     views = db.Column(db.Integer, default=0)
 
