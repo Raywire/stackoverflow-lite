@@ -13,6 +13,7 @@ class User(db.Model):
   email = db.Column(db.String(120), unique=True)
   pwdhash = db.Column(db.String(54))
   questions = db.relationship('Question', backref='asker')
+  answers = db.relationship('Answer',backref='responder')
 
   def __init__(self, firstname, lastname, email, password):
     self.firstname = firstname.title()
@@ -35,6 +36,7 @@ class Question(db.Model):
     last_updated = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
     starter = db.Column(db.Integer, db.ForeignKey('users.uid'))
     views = db.Column(db.Integer, default=0)
+    answersto = db.relationship('Answer',backref='responderto')
 
     def __init__(self, title, body, date_posted, last_updated, starter, views):
         self.title = title.title()
@@ -43,7 +45,19 @@ class Question(db.Model):
         self.last_updated = last_updated
         self.starter = starter
         self.views = views
-'''
+
 class Answer(db.Model):
     __tablename__ = 'answers'
-'''
+    aid = db.Column(db.Integer, primary_key = True)
+    body = db.Column(db.Text, nullable = False)
+    question_tag = db.Column(db.Integer, db.ForeignKey('questions.qid'))
+    date_posted = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
+    updated_at = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
+    answered_by = db.Column(db.Integer, db.ForeignKey('users.uid'))
+
+    def __init__(self, body, question_tag, date_posted, updated_at, answered_by):
+        self.body = body.title()
+        self.question_tag = question_tag
+        self.date_posted = date_posted
+        self.updated_at = updated_at
+        self.answered_by= answered_by

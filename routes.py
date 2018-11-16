@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
-from models import db, User, Question
+from models import db, User, Question, Answer
 from forms import SignupForm, LoginForm, QuestionForm, ReplyForm
 
 import datetime
@@ -88,8 +88,13 @@ def new_question():
 @app.route("/questions/<int:qid>")
 def view_question(qid):
 
-    question = Question.query.filter_by(qid=qid).first()
+    question = Question.query.filter_by(qid = qid).first()
     user = User.query.filter_by(email = session['email']).first()
+    session_key = [];
+    if question.qid not in session_key:
+        question.views += 1
+        db.session.commit()
+        session_key.append(question.qid)
     return render_template("view_question.html", question = question, user = user)
 
 @app.route("/questions/<int:qid>/reply", methods=["GET", "POST"])
@@ -98,9 +103,23 @@ def reply_question(qid):
         return redirect(url_for('login'))
 
     form = ReplyForm()
-
     question = Question.query.filter_by(qid=qid).first()
-    return render_template("reply_question.html", question = question, form = form)
+
+    if request.method == 'POST':
+        if form.validate() == False:
+            return render_template('reply_question.html', form=form)
+        else:
+            user = User.query.filter_by(email = session['email']).first()
+            newanswer = Answer(form.message.data, question_tag = qid, date_posted = datetime.datetime.utcnow(), updated_at = datetime.datetime.utcnow(), answered_by = user.uid)
+            db.session.add(newanswer)
+            db.session.commit()
+
+            return redirect(url_for('view_question', qid = qid))
+    elif request.method == 'GET':
+        return render_template("reply_question.html", question = question, form = form)
+
+
+
 
 @app.route("/question/<int:qid>/delete")
 def delete_question(qid):
