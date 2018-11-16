@@ -6,7 +6,7 @@
 <main class="container signup-section">
   <div class="section-content">
 
-    <form method="POST" action="/reply_question">
+    <form method="POST" action="/questions/{{ question.qid }}/reply">
       {{ form.hidden_tag() }}
 
       <div class="form-group">
