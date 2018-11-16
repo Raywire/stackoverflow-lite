@@ -13,10 +13,10 @@
 <p>asked  {{ question.date_posted }}</p>
 <p>viewed {{ question.views }}</p>
 
-<h2>Answers</h2>
+<h2>Answers {{ count }}</h2>
 {% for answer in answers %}
 {% if answer %}
-<p>{{ answer.body }}</p>
+<p>{{ answer.body }} by {{ answer.responder.firstname }} {{ answer.responder.lastname }}</p>
 {% else %}
 <p>No answers posted yet</p>
 {% endif %}

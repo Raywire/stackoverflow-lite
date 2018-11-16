@@ -87,15 +87,20 @@ def new_question():
 
 @app.route("/questions/<int:qid>")
 def view_question(qid):
+    if 'email' not in session:
+        return redirect(url_for('login'))
+
     answers = Answer.query.filter_by(question_tag = qid)
     question = Question.query.filter_by(qid = qid).first()
+    #session.query(User).filter(User.name.like('%ed')).count()
+    count = Answer.query.filter_by(question_tag = qid).count()
     user = User.query.filter_by(email = session['email']).first()
     session_key = [];
     if question.qid not in session_key:
         question.views += 1
         db.session.commit()
         session_key.append(question.qid)
-    return render_template("view_question.html", question = question, user = user, answers = answers)
+    return render_template("view_question.html", question = question, user = user, answers = answers, count = count)
 
 @app.route("/questions/<int:qid>/reply", methods=["GET", "POST"])
 def reply_question(qid):

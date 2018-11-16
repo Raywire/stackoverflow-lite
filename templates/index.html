@@ -12,7 +12,7 @@
       <th>Asked by</th>
       <th>Replies</th>
       <th>Views</th>
-      <th>Last Update</th>
+      <th>Posted</th>
     </tr>
   </thead>
   <tbody>
@@ -31,7 +31,7 @@
         <td>{{ question.asker.firstname }} {{ question.asker.lastname }}</td>
         <td>0</td>
         <td>{{ question.views }}</td>
-        <td>{{ question.last_updated }}</td>
+        <td>{{ question.date_posted }}</td>
       </tr>
     {% endfor %}
   </tbody>
