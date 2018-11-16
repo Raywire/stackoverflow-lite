@@ -15,6 +15,10 @@ class LoginForm(FlaskForm):
   submit = SubmitField("Sign in")
 
 class QuestionForm(FlaskForm):
-    subject = StringField('Title')
-    message = TextAreaField('Body')
+    subject = StringField('Title', validators=[DataRequired("Please enter a title.")])
+    message = TextAreaField('Body', validators=[DataRequired("Please enter your question.")])
     submit = SubmitField("Post Your Question")
+
+class ReplyForm(FlaskForm):
+    message = TextAreaField('Body', validators=[DataRequired("Please enter your answer.")])
+    submit = SubmitField("Post Your Answer")

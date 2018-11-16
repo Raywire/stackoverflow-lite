@@ -9,7 +9,7 @@
   <thead class="thead-inverse">
     <tr>
       <th>Topic</th>
-      <th>Starter</th>
+      <th>Asked by</th>
       <th>Replies</th>
       <th>Views</th>
       <th>Last Update</th>
@@ -21,14 +21,14 @@
       <tr>
         <td>
           <p class="mb-0">
-            <a href="">{{ question.title }}</a>
+            <a href="{{ url_for('view_question', qid = question.qid) }}">{{ question.title }}</a>
           </p>
           <small class="text-muted">
 
 
           </small>
         </td>
-        <td>{{ question.starter }}</td>
+        <td>{{ question.asker.firstname }} {{ question.asker.lastname }}</td>
         <td>0</td>
         <td>{{ question.views }}</td>
         <td>{{ question.last_updated }}</td>

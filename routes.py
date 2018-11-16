@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from models import db, User, Question
-from forms import SignupForm, LoginForm, QuestionForm
+from forms import SignupForm, LoginForm, QuestionForm, ReplyForm
 
 import datetime
 
@@ -76,13 +76,39 @@ def new_question():
         if form.validate() == False:
             return render_template('new_question.html', form=form)
         else:
-            newquestion = Question(form.subject.data, form.message.data, date_posted = datetime.datetime.utcnow(), last_updated = datetime.datetime.utcnow(), starter = 1 , views = 0)
+            user = User.query.filter_by(email = session['email']).first()
+            newquestion = Question(form.subject.data, form.message.data, date_posted = datetime.datetime.utcnow(), last_updated = datetime.datetime.utcnow(), starter = user.uid , views = 0)
             db.session.add(newquestion)
             db.session.commit()
 
             return redirect(url_for('index'))
     elif request.method == 'GET':
         return render_template("new_question.html", form=form)
+
+@app.route("/questions/<int:qid>")
+def view_question(qid):
+
+    question = Question.query.filter_by(qid=qid).first()
+    user = User.query.filter_by(email = session['email']).first()
+    return render_template("view_question.html", question = question, user = user)
+
+@app.route("/questions/<int:qid>/reply", methods=["GET", "POST"])
+def reply_question(qid):
+    if 'email' not in session:
+        return redirect(url_for('login'))
+
+    form = ReplyForm()
+
+    question = Question.query.filter_by(qid=qid).first()
+    return render_template("reply_question.html", question = question, form = form)
+
+@app.route("/question/<int:qid>/delete")
+def delete_question(qid):
+    question = Question.query.filter_by(qid=qid).first()
+    db.session.delete(question)
+    db.session.commit()
+
+    return redirect(url_for('index'))
 
 
 if __name__ == "__main__":
