@@ -2,7 +2,8 @@
 {% block title %}Reply to Question - Stack Overflow Lite{% endblock %}
 {% block stylesheet %}    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">{% endblock %}
 {% block content %}
-<h1>Reply to Question {{ question.qid }}</h1>
+<h2>Reply to :</h2>
+<p>{{ question.title }}</p>
 <main class="container signup-section">
   <div class="section-content">
 

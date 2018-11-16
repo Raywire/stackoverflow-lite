@@ -12,4 +12,13 @@
 <p>{{ question.body }}</p>
 <p>asked  {{ question.date_posted }}</p>
 <p>viewed {{ question.views }}</p>
+
+<h2>Answers</h2>
+{% for answer in answers %}
+{% if answer %}
+<p>{{ answer.body }}</p>
+{% else %}
+<p>No answers posted yet</p>
+{% endif %}
+{% endfor %}
 {% endblock %}
