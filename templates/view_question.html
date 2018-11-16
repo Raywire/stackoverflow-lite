@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}View Question - Stack Overflow Lite{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('reply_question', qid = question.qid) }}" class="btn btn-primary" role="button">Reply</a>
+  {% if user.uid == question.starter %}
+  <a href="{{ url_for('delete_question', qid = question.qid) }}" class="btn btn-primary" role="button">Delete</a>
+  {% endif %}
+</div>
+<p>asker={{ question.asker.firstname }} id={{ question.starter }}</p>
+<h1>{{ question.title }}</h1>
+<p>{{ question.body }}</p>
+<p>asked  {{ question.date_posted }}</p>
+<p>viewed {{ question.views }}</p>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Reply to Question - Stack Overflow Lite{% endblock %}
+{% block stylesheet %}    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">{% endblock %}
+{% block content %}
+<h1>Reply to Question {{ question.qid }}</h1>
+<main class="container signup-section">
+  <div class="section-content">
+
+    <form method="POST" action="/reply_question">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        {{ form.message.label }}
+        {{ form.message }}
+      </div>
+
+      {{ form.submit(class="btn-primary") }}
+
+    </form>
+  </div>
+</main>
+
+{% endblock %}
