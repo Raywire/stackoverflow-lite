@@ -31,7 +31,7 @@
         <td>{{ question.asker.firstname }} {{ question.asker.lastname }}</td>
         <td>0</td>
         <td>{{ question.views }}</td>
-        <td>{{ question.date_posted }}</td>
+        <td>{{ question.date_posted|humanize() }}</td>
       </tr>
     {% endfor %}
   </tbody>
