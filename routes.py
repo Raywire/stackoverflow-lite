@@ -87,7 +87,7 @@ def new_question():
 
 @app.route("/questions/<int:qid>")
 def view_question(qid):
-
+    answers = Answer.query.filter_by(question_tag = qid)
     question = Question.query.filter_by(qid = qid).first()
     user = User.query.filter_by(email = session['email']).first()
     session_key = [];
@@ -95,7 +95,7 @@ def view_question(qid):
         question.views += 1
         db.session.commit()
         session_key.append(question.qid)
-    return render_template("view_question.html", question = question, user = user)
+    return render_template("view_question.html", question = question, user = user, answers = answers)
 
 @app.route("/questions/<int:qid>/reply", methods=["GET", "POST"])
 def reply_question(qid):
