@@ -17,6 +17,10 @@
 {% for answer in answers %}
 {% if answer %}
 <p>{{ answer.body }} by {{ answer.responder.firstname }} {{ answer.responder.lastname }}</p>
+<p>{{ answer.date_posted|humanize }}</p>
+
+<p><a href="{{ url_for('reply_question', qid = question.qid) }}" class="btn btn-primary" role="button">Comment</a></p>
+
 {% else %}
 <p>No answers posted yet</p>
 {% endif %}
