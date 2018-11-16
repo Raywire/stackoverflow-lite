@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from models import db, User, Question, Answer
 from forms import SignupForm, LoginForm, QuestionForm, ReplyForm
+from flask_humanize import Humanize
 
 import datetime
 
 app = Flask(__name__)
+humanize = Humanize(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:@password@localhost/database'
 db.init_app(app)
