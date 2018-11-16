@@ -15,7 +15,8 @@ app.secret_key = "development-key"
 
 @app.route("/")
 def index():
-    questions = Question.query.all()
+    #questions = Question.query.all()
+    questions = Question.query.order_by(Question.date_posted.desc())
     return render_template("index.html", questions=questions)
 
 @app.route("/about")
@@ -92,7 +93,7 @@ def view_question(qid):
     if 'email' not in session:
         return redirect(url_for('login'))
 
-    answers = Answer.query.filter_by(question_tag = qid)
+    answers = Answer.query.filter_by(question_tag = qid).order_by(Answer.date_posted.desc())
     question = Question.query.filter_by(qid = qid).first()
     #session.query(User).filter(User.name.like('%ed')).count()
     count = Answer.query.filter_by(question_tag = qid).count()
