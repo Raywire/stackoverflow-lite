@@ -12,6 +12,7 @@ class User(db.Model):
   lastname = db.Column(db.String(100))
   email = db.Column(db.String(120), unique=True)
   pwdhash = db.Column(db.String(54))
+  questions = db.relationship('Question', backref='asker')
 
   def __init__(self, firstname, lastname, email, password):
     self.firstname = firstname.title()
@@ -32,12 +33,9 @@ class Question(db.Model):
     body = db.Column(db.Text, nullable = False)
     date_posted = db.Column(db.DateTime, nullable = False, default=datetime.datetime.utcnow())
     last_updated = db.Column(db.DateTime, nullable = False, default=datetime.datetime.utcnow())
-    #starter = db.Column(db.Integer,nullable=False, db.ForeignKey('uid.id'))#ForeignKey to reference uid in users table
-    #user = db.relationship('User', backref=db.backref('questions', lazy=True))
-    starter = db.Column(db.Integer)
+    starter = db.Column(db.Integer, db.ForeignKey('users.uid'))
     views = db.Column(db.Integer, default=0)
-    #starter = db.Column(db.Integer, db.ForeignKey('user.uid'))
-    #user = db.relationship("User", backref = db.backref("user", uselist=False))
+
     def __init__(self, title, body, date_posted, last_updated, starter, views):
         self.title = title.title()
         self.body = body.title()
