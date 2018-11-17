@@ -12,14 +12,18 @@ class User(db.Model):
   lastname = db.Column(db.String(100))
   email = db.Column(db.String(120), unique=True)
   pwdhash = db.Column(db.String(54))
+  public_id = db.Column(db.String(50), unique=True)
+  admin = db.Column(db.Boolean)
   questions = db.relationship('Question', backref='asker')
   answers = db.relationship('Answer',backref='responder')
 
-  def __init__(self, firstname, lastname, email, password):
+  def __init__(self, firstname, lastname, email, password, admin, public_id,):
     self.firstname = firstname.title()
     self.lastname = lastname.title()
     self.email = email.lower()
     self.set_password(password)
+    self.admin = admin
+    self.public_id = public_id
 
   def set_password(self, password):
     self.pwdhash = generate_password_hash(password)
