@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
 {% block title %}View Question - Stack Overflow Lite{% endblock %}
+
 {% block content %}
 <div class="mb-4">
   <a href="{{ url_for('reply_question', qid = question.qid) }}" class="btn btn-primary" role="button">Reply</a>
   {% if user.uid == question.starter %}
-  <a href="{{ url_for('delete_question', qid = question.qid) }}" class="btn btn-primary" role="button">Delete</a>
+  <a href="{{ url_for('delete_question', qid = question.qid) }}" class="btn btn-danger" role="button"><span class="glyphicon glyphicon-trash"></span> Delete</a>
   {% endif %}
 </div>
 <p>asker={{ question.asker.firstname }} id={{ question.starter }}</p>

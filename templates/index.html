@@ -10,7 +10,7 @@
     <tr>
       <th>Topic</th>
       <th>Asked by</th>
-      <th>Replies</th>
+      <th>Answers</th>
       <th>Views</th>
       <th>Posted</th>
     </tr>
@@ -29,7 +29,7 @@
           </small>
         </td>
         <td>{{ question.asker.firstname }} {{ question.asker.lastname }}</td>
-        <td>0</td>
+        <td>{{ questions.count() }}</td>
         <td>{{ question.views }}</td>
         <td>{{ question.date_posted|humanize() }}</td>
       </tr>
