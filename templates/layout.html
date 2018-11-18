@@ -36,7 +36,7 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
                   <a class="dropdown-item" href="{{ url_for('user_questions', public_id = session['public_id']) }}">My questions</a>
                   <a class="dropdown-item" href="">My account</a>
-                  <a class="dropdown-item" href="">Change password</a>
+                  <a class="dropdown-item" href="{{ url_for('reset_password') }}">Change password</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a>
                 </div>

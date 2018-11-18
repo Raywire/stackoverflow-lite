@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify, make_response, flash
 from models import db, User, Question, Answer
-from forms import SignupForm, LoginForm, QuestionForm, ReplyForm
+from forms import SignupForm, LoginForm, QuestionForm, ReplyForm, ResetPasswordForm
 from flask_humanize import Humanize
 from werkzeug import generate_password_hash, check_password_hash
 from functools import wraps
@@ -164,6 +164,30 @@ def delete_question(qid):
     flash(f'Question has been deleted', 'success')
 
     return redirect(url_for('index'))
+
+
+@app.route("/settings/password", methods = ['GET', 'POST'])
+def reset_password():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    form = ResetPasswordForm()
+    if request.method == "POST":
+        if form.validate() == False:
+            return render_template("reset_password.html", form=form)
+        else:
+            old_password = form.old_password.data
+            password = form.password.data
+            user = User.query.filter_by(email=session['email']).first()
+            if user is not None and user.check_password(old_password):
+                user.pwdhash = generate_password_hash(password)
+                db.session.commit()
+                flash(f'Password reset successful', 'success')
+                return render_template('reset_password.html', form=form)
+            else:
+                flash(f'Current password is incorrect', 'danger')
+                return render_template('reset_password.html', form=form)
+    elif request.method == "GET":
+        return render_template('reset_password.html', form=form)
 
 
 ########## API   #############################################################################################################################################

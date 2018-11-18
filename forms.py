@@ -23,3 +23,9 @@ class QuestionForm(FlaskForm):
 class ReplyForm(FlaskForm):
     message = TextAreaField('Body', validators=[DataRequired("Please enter your answer.")])
     submit = SubmitField("Post Your Answer")
+
+class ResetPasswordForm(FlaskForm):
+    old_password = PasswordField('Current Password', validators=[DataRequired("Please enter a password."), Length(min=1, message="Enter a valid password.")])
+    password = PasswordField('New Password', validators=[DataRequired("Please enter a password."), Length(min=6, message="Passwords must be 6 characters or more.")])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired("Passwords must match"), EqualTo('password')])
+    submit = SubmitField("Reset Password")
