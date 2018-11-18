@@ -19,8 +19,6 @@ app.secret_key = "d01815253d8243a221d12a681589155e"
 
 @app.route("/")
 def index():
-    #questions = Question.query.all()
-    #questions = Question.query.order_by(Question.date_posted.desc())
     page = request.args.get('page', 1, type = int)
     questions = Question.query.order_by(Question.date_posted.desc()).paginate(page = page, per_page = 10)
     answers = Answer.query.all()
@@ -51,6 +49,7 @@ def signup():
                 db.session.commit()
 
                 session['email'] = newuser.email
+                session['public_id'] = newuser.public_id
                 flash(f'Account created for {form.email.data}', 'success')
                 return redirect(url_for('index'))
     elif request.method == 'GET':
@@ -71,6 +70,7 @@ def login():
             user = User.query.filter_by(email=email).first()
             if user is not None and user.check_password(password):
                 session['email'] = form.email.data
+                session['public_id'] = user.public_id
                 flash(f'Login successful', 'info')
                 return redirect(url_for('index'))
             else:
@@ -99,6 +99,7 @@ def new_question():
             newquestion = Question(form.subject.data, form.message.data, date_posted = datetime.datetime.utcnow(), last_updated = datetime.datetime.utcnow(), starter = user.uid , views = 0)
             db.session.add(newquestion)
             db.session.commit()
+            flash(f'Question has been posted', 'info')
 
             return redirect(url_for('index'))
     elif request.method == 'GET':
@@ -121,6 +122,15 @@ def view_question(qid):
         db.session.commit()
         session_key.append(question.qid)
     return render_template("view_question.html", question = question, user = user, answers = answers, count = count)
+
+@app.route("/questions/user/<public_id>")
+def user_questions(public_id):
+    page = request.args.get('page', 1, type = int)
+    user = User.query.filter_by(public_id=public_id).first_or_404()
+    fullname = user.firstname + ' ' + user.lastname
+    questions = Question.query.filter_by(starter=user.uid).order_by(Question.date_posted.desc()).paginate(page = page, per_page = 10)
+    answers = Answer.query.all()
+    return render_template("user_questions.html", questions = questions, answers = answers, fullname = fullname)
 
 @app.route("/questions/<int:qid>/reply", methods=["GET", "POST"])
 def reply_question(qid):
