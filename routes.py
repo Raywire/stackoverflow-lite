@@ -20,7 +20,9 @@ app.secret_key = "d01815253d8243a221d12a681589155e"
 @app.route("/")
 def index():
     #questions = Question.query.all()
-    questions = Question.query.order_by(Question.date_posted.desc())
+    #questions = Question.query.order_by(Question.date_posted.desc())
+    page = request.args.get('page', 1, type = int)
+    questions = Question.query.order_by(Question.date_posted.desc()).paginate(page = page, per_page = 10)
     answers = Answer.query.all()
     return render_template("index.html", questions = questions, answers = answers)
 

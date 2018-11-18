@@ -16,7 +16,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for question in questions %}
+    {% for question in questions.items %}
 
       <tr>
         <td>
@@ -29,11 +29,24 @@
           </small>
         </td>
         <td>{{ question.asker.firstname }} {{ question.asker.lastname }}</td>
-        <td>{% for answer in question.answersto %}{% endfor %}{{question.answersto}}</td>        
+        <td>{% for answer in question.answersto %}{% endfor %}{{question.answersto}}</td>
         <td>{{ question.views }}</td>
         <td>{{ question.date_posted|humanize() }}</td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
+{% for page_num in questions.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+  {% if page_num %}
+    {% if questions.page == page_num %}
+      <a class="btn btn-info mb-4" href="{{ url_for('index', page = page_num) }}">{{ page_num }}</a>
+    {% else %}
+      <a class="btn btn-outline-info mb-4" href="{{ url_for('index', page = page_num) }}">{{ page_num }}</a>
+    {% endif %}
+  {% else %}
+    ...
+  {% endif %}
+{% endfor %}
+
+
 {% endblock %}
