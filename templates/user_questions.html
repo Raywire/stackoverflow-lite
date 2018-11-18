@@ -26,7 +26,7 @@
 
           </small>
         </td>
-        <td>{% for answer in question.answersto %}{% endfor %}{{question.answersto}}</td>
+        <td>{{question.answersto|length}}</td>
         <td>{{ question.views }}</td>
         <td>{{ question.date_posted|humanize() }}</td>
       </tr>
