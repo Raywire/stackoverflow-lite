@@ -149,6 +149,7 @@ def delete_question(qid):
     question = Question.query.filter_by(qid=qid).first()
     db.session.delete(question)
     db.session.commit()
+    flash(f'Question has been deleted', 'success')
 
     return redirect(url_for('index'))
 

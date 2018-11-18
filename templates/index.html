@@ -29,7 +29,7 @@
           </small>
         </td>
         <td>{{ question.asker.firstname }} {{ question.asker.lastname }}</td>
-        <td>{{ questions.count() }}</td>
+        <td>{% for answer in question.answersto %}{% endfor %}{{question.answersto}}</td>        
         <td>{{ question.views }}</td>
         <td>{{ question.date_posted|humanize() }}</td>
       </tr>

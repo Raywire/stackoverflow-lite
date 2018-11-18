@@ -14,8 +14,8 @@ class User(db.Model):
   pwdhash = db.Column(db.String(54))
   public_id = db.Column(db.String(50), unique=True)
   admin = db.Column(db.Boolean)
-  questions = db.relationship('Question', backref='asker')
-  answers = db.relationship('Answer',backref='responder')
+  questions = db.relationship('Question', backref='asker', lazy = True)
+  answers = db.relationship('Answer', backref='responder', lazy = True)
 
   def __init__(self, firstname, lastname, email, password, admin, public_id,):
     self.firstname = firstname.title()
@@ -40,7 +40,7 @@ class Question(db.Model):
     last_updated = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
     starter = db.Column(db.Integer, db.ForeignKey('users.uid'))
     views = db.Column(db.Integer, default=0)
-    answersto = db.relationship('Answer',backref='responderto')
+    answersto = db.relationship('Answer', backref='responderto', lazy = True)
 
     def __init__(self, title, body, date_posted, last_updated, starter, views):
         self.title = title.title()
