@@ -3,9 +3,9 @@
 
 {% block content %}
 <div class="mb-4">
-  <a href="{{ url_for('reply_question', qid = question.qid) }}" class="btn btn-primary" role="button">Reply</a>
+  <a href="{{ url_for('reply_question', qid = question.qid) }}" class="btn btn-primary btn-sm m-1" role="button">Reply</a>
   {% if user.uid == question.starter %}
-  <a href="{{ url_for('delete_question', qid = question.qid) }}" class="btn btn-danger" role="button"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+  <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
   {% endif %}
 </div>
 <p>asker={{ question.asker.firstname }} id={{ question.starter }}</p>
@@ -26,4 +26,24 @@
 <p>No answers posted yet</p>
 {% endif %}
 {% endfor %}
+
+
+<!--Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Are you sure you want to delete this question</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <a href="{{ url_for('delete_question', qid = question.qid) }}" class="btn btn-danger" role="button"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
