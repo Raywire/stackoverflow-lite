@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify, make_response, flash
 from models import db, User, Question, Answer
-from forms import SignupForm, LoginForm, QuestionForm, ReplyForm, ResetPasswordForm
+from forms import SignupForm, LoginForm, QuestionForm, ReplyForm, ResetPasswordForm, UpdateAccountForm
 from flask_humanize import Humanize
 from werkzeug import generate_password_hash, check_password_hash
 from functools import wraps
@@ -188,6 +188,30 @@ def reset_password():
                 return render_template('reset_password.html', form=form)
     elif request.method == "GET":
         return render_template('reset_password.html', form=form)
+
+@app.route("/settings/account", methods = ['GET', 'POST'])
+def user_account():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+
+    form = UpdateAccountForm()
+    user = User.query.filter_by(email=session['email']).first()
+
+    if request.method == "POST":
+        if form.validate() == False:
+            return render_template('account.html', user = user, form = form)
+        else:
+            user.firstname = form.first_name.data
+            user.lastname = form.last_name.data
+            db.session.commit()
+            flash('Your account has been updated', 'success')
+            return redirect(url_for('user_account'))
+
+    elif request.method == "GET":
+        form.first_name.data = user.firstname
+        form.last_name.data = user.lastname
+        return render_template('account.html', user = user, form = form)
+
 
 
 ########## API   #############################################################################################################################################
