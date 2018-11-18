@@ -15,7 +15,7 @@ humanize = Humanize(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:@password@localhost/database'
 db.init_app(app)
 
-app.secret_key = "development-key"
+app.secret_key = "d01815253d8243a221d12a681589155e"
 
 @app.route("/")
 def index():
@@ -38,13 +38,19 @@ def signup():
         if form.validate() == False:
             return render_template('signup.html', form=form)
         else:
-            newuser = User(form.first_name.data, form.last_name.data, form.email.data, form.password.data, admin = False, public_id = str(uuid.uuid4()))
-            db.session.add(newuser)
-            db.session.commit()
+            #check if email exists
+            user = User.query.filter_by(email = form.email.data).first()
+            if user is not None:
+                flash(f'Account for {form.email.data} already exists', 'warning')
+                return render_template("signup.html", form=form)
+            else:
+                newuser = User(form.first_name.data, form.last_name.data, form.email.data, form.password.data, admin = False, public_id = str(uuid.uuid4()))
+                db.session.add(newuser)
+                db.session.commit()
 
-            session['email'] = newuser.email
-            flash(f'Account created for {form.email.data}', 'success')
-            return redirect(url_for('index'))
+                session['email'] = newuser.email
+                flash(f'Account created for {form.email.data}', 'success')
+                return redirect(url_for('index'))
     elif request.method == 'GET':
         return render_template("signup.html", form=form)
 
@@ -63,6 +69,7 @@ def login():
             user = User.query.filter_by(email=email).first()
             if user is not None and user.check_password(password):
                 session['email'] = form.email.data
+                flash(f'Login successful', 'info')
                 return redirect(url_for('index'))
             else:
                 flash(f'Check your email or password', 'danger')
