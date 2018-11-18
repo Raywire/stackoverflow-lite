@@ -1,15 +1,14 @@
 {% extends "layout.html" %}
-{% block title %}Home Stack Overflow Lite{% endblock %}
+{% block title %}Questions by {{ fullname }} {% endblock %}
 {%block content%}
 <div class="mb-4">
   <a href="{{ url_for('new_question') }}" class="btn btn-primary">Ask Question</a>
 </div>
-
+<h2>Asked by: {{ fullname }} ({{ questions.total }})</h2>
 <table class="table table-striped mb-4">
   <thead class="thead-inverse">
     <tr>
       <th>Topic</th>
-      <th>Asked by</th>
       <th>Answers</th>
       <th>Views</th>
       <th>Posted</th>
@@ -17,7 +16,6 @@
   </thead>
   <tbody>
     {% for question in questions.items %}
-
       <tr>
         <td>
           <p class="mb-0">
@@ -28,25 +26,14 @@
 
           </small>
         </td>
-        <td><a href="{{ url_for('user_questions', public_id = question.asker.public_id) }}">{{ question.asker.firstname }} {{ question.asker.lastname }}</a></td>
-        <td>{{question.answersto|length}}</td>
+        <td>{% for answer in question.answersto %}{% endfor %}{{question.answersto}}</td>
         <td>{{ question.views }}</td>
         <td>{{ question.date_posted|humanize() }}</td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
-{% for page_num in questions.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-  {% if page_num %}
-    {% if questions.page == page_num %}
-      <a class="btn btn-info mb-4" href="{{ url_for('index', page = page_num) }}">{{ page_num }}</a>
-    {% else %}
-      <a class="btn btn-outline-info mb-4" href="{{ url_for('index', page = page_num) }}">{{ page_num }}</a>
-    {% endif %}
-  {% else %}
-    ...
-  {% endif %}
-{% endfor %}
+
 
 
 {% endblock %}
