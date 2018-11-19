@@ -4,6 +4,7 @@ from forms import SignupForm, LoginForm, QuestionForm, ReplyForm, ResetPasswordF
 from flask_humanize import Humanize
 from werkzeug import generate_password_hash, check_password_hash
 from functools import wraps
+from momentjs import momentjs
 
 import datetime
 import uuid
@@ -14,8 +15,10 @@ humanize = Humanize(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:@password@localhost/database'
 db.init_app(app)
+HUMANIZE_USE_UTC = True
 
 app.secret_key = "d01815253d8243a221d12a681589155e"
+app.jinja_env.globals['momentjs'] = momentjs
 
 @app.route("/")
 def index():
@@ -116,7 +119,7 @@ def view_question(qid):
     count = Answer.query.filter_by(question_tag = qid).count()
 
     user = User.query.filter_by(email = session['email']).first()
-    session_key = [];
+    session_key = []
     if question.qid not in session_key:
         question.views += 1
         db.session.commit()
@@ -127,7 +130,13 @@ def view_question(qid):
 def user_questions(public_id):
     page = request.args.get('page', 1, type = int)
     user = User.query.filter_by(public_id=public_id).first_or_404()
-    fullname = user.firstname + ' ' + user.lastname
+    if 'email' in session:
+        if user.email == session['email']:
+            fullname = "Me"
+        else:
+            fullname = user.firstname + ' ' + user.lastname
+    else:
+        fullname = user.firstname + ' ' + user.lastname
     questions = Question.query.filter_by(starter=user.uid).order_by(Question.date_posted.desc()).paginate(page = page, per_page = 10)
     answers = Answer.query.all()
     return render_template("user_questions.html", questions = questions, answers = answers, fullname = fullname)
@@ -158,12 +167,38 @@ def reply_question(qid):
 
 @app.route("/question/<int:qid>/delete")
 def delete_question(qid):
-    question = Question.query.filter_by(qid=qid).first()
+    question = Question.query.filter_by(qid = qid).first()
     db.session.delete(question)
     db.session.commit()
     flash(f'Question has been deleted', 'success')
 
     return redirect(url_for('index'))
+
+@app.route("/question/<int:qid>/answer/<int:aid>/accept")
+def accept_answer(qid, aid):
+    answer = Answer.query.filter_by(aid = aid).first()
+    answers = Answer.query.filter_by(question_tag = qid).order_by(Answer.date_posted.desc())
+    question = Question.query.filter_by(qid = qid).first()
+    user = User.query.filter_by(email = session['email']).first()
+
+    answer.accepted = True
+    db.session.commit()
+
+    #flash('Answer has been accepted', 'success')
+    return render_template("view_question.html", answers = answers, question = question, user = user, qid = qid)
+
+@app.route("/question/<int:qid>/answer/<int:aid>/reject")
+def reject_answer(qid, aid):
+    answer = Answer.query.filter_by(aid = aid).first()
+    answers = Answer.query.filter_by(question_tag = qid).order_by(Answer.date_posted.desc())
+    question = Question.query.filter_by(qid = qid).first()
+    user = User.query.filter_by(email = session['email']).first()
+
+    answer.accepted = False
+    db.session.commit()
+
+    #flash('Answer has been accepted', 'success')
+    return render_template("view_question.html", answers = answers, question = question, user = user, qid = qid)
 
 
 @app.route("/settings/password", methods = ['GET', 'POST'])
@@ -173,7 +208,7 @@ def reset_password():
     form = ResetPasswordForm()
     if request.method == "POST":
         if form.validate() == False:
-            return render_template("reset_password.html", form=form)
+            return render_template("reset_password.html", form = form)
         else:
             old_password = form.old_password.data
             password = form.password.data
@@ -182,10 +217,10 @@ def reset_password():
                 user.pwdhash = generate_password_hash(password)
                 db.session.commit()
                 flash(f'Password reset successful', 'success')
-                return render_template('reset_password.html', form=form)
+                return redirect(url_for('reset_password'))
             else:
                 flash(f'Current password is incorrect', 'danger')
-                return render_template('reset_password.html', form=form)
+                return redirect(url_for('reset_password'))
     elif request.method == "GET":
         return render_template('reset_password.html', form=form)
 
@@ -195,7 +230,7 @@ def user_account():
         return redirect(url_for('login'))
 
     form = UpdateAccountForm()
-    user = User.query.filter_by(email=session['email']).first()
+    user = User.query.filter_by(email = session['email']).first()
 
     if request.method == "POST":
         if form.validate() == False:

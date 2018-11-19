@@ -28,7 +28,7 @@
         </td>
         <td>{{question.answersto|length}}</td>
         <td>{{ question.views }}</td>
-        <td>{{ question.date_posted|humanize() }}</td>
+        <td>{{ momentjs(question.date_posted).fromNow() }}</td>
       </tr>
     {% endfor %}
   </tbody>

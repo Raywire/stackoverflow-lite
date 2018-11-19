@@ -57,6 +57,7 @@ class Answer(db.Model):
     question_tag = db.Column(db.Integer, db.ForeignKey('questions.qid'))
     date_posted = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
     updated_at = db.Column(db.DateTime, nullable = False, default = datetime.datetime.utcnow())
+    accepted = db.Column(db.Boolean, default = False)
     answered_by = db.Column(db.Integer, db.ForeignKey('users.uid'))
 
     def __init__(self, body, question_tag, date_posted, updated_at, answered_by):
