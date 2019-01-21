@@ -271,7 +271,7 @@ def token_required(f):
 
     return decorated
 
-@app.route("/auth/getusers", methods=['GET'])
+@app.route("/api/v1/auth/users", methods=['GET'])
 @token_required
 def get_all_users(current_user):
 
@@ -294,7 +294,7 @@ def get_all_users(current_user):
 
     return jsonify({'users' : output})
 
-@app.route("/auth/getuser/<public_id>", methods=['GET'])
+@app.route("/api/v1/auth/user/<public_id>", methods=['GET'])
 @token_required
 def get_one_user(current_user, public_id):
 
@@ -316,7 +316,7 @@ def get_one_user(current_user, public_id):
 
     return jsonify({'user' : user_data})
 
-@app.route("/auth/signup", methods=['POST'])
+@app.route("/api/v1/auth/signup", methods=['POST'])
 @token_required
 def create_user(current_user):
 
@@ -330,7 +330,7 @@ def create_user(current_user):
     db.session.commit()
     return jsonify({'message':'new user created'})
 
-@app.route("/auth/promoteuser/<public_id>", methods=['PUT'])
+@app.route("/api/v1/auth/promoteuser/<public_id>", methods=['PUT'])
 @token_required
 def promote_user(current_user, public_id):
 
@@ -347,7 +347,7 @@ def promote_user(current_user, public_id):
 
     return jsonify({'message' : 'The user has been promoted'})
 
-@app.route("/auth/deleteuser/<public_id>", methods=['DELETE'])
+@app.route("/api/v1/auth/deleteuser/<public_id>", methods=['DELETE'])
 @token_required
 def delete_user(current_user, public_id):
 
@@ -364,7 +364,7 @@ def delete_user(current_user, public_id):
 
     return jsonify({'message' : 'The user has been deleted'})
 
-@app.route('/auth/login')
+@app.route('/api/v1/auth/login')
 def auth_login():
     auth = request.authorization
 
@@ -383,7 +383,7 @@ def auth_login():
 
     return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
 
-@app.route('/questions', methods=['GET'])
+@app.route('/api/v1/questions', methods=['GET'])
 def get_all_questions():
     questions = Question.query.order_by(Question.date_posted.desc())
 
@@ -402,9 +402,23 @@ def get_all_questions():
 
     return jsonify({'questions' : output})
 
-@app.route('/questions/<questionId>', methods=['GET'])
-def get_one_question(questionId):
+@app.route('/api/v1/questions/<questionId>', methods=['GET'])
+@token_required
+def get_one_question(current_user, questionId):
     question = Question.query.filter_by(qid = questionId).first()
+    answers = Answer.query.filter_by(question_tag = questionId)
+    answer_output = []
+
+    for answer in answers:
+        answer_data = {}
+        answer_data['aid'] = answer.aid
+        answer_data['question_tag'] = answer.question_tag
+        answer_data['body'] = answer.body
+        answer_data['date_posted'] = answer.date_posted
+        answer_data['updated_at'] = answer.updated_at
+        answer_data['answered_by'] = answer.responder.firstname + ' ' + answer.responder.lastname
+        answer_data['accepted'] = answer.accepted
+        answer_output.append(answer_data)
 
     if not question:
         return jsonify({'message' : 'Question not found'})
@@ -415,12 +429,13 @@ def get_one_question(questionId):
     question_data['body'] = question.body
     question_data['date_posted'] = question.date_posted
     question_data['last_updated'] = question.last_updated
-    question_data['starter'] = question.starter
+    question_data['starter'] = question.asker.firstname + ' ' + question.asker.lastname
     question_data['views'] = question.views
+    question_data['answers'] = answer_output
 
     return jsonify({'question' : question_data})
 
-@app.route('/questions', methods=['POST'])
+@app.route('/api/v1/questions', methods=['POST'])
 @token_required
 def post_question(current_user):
     data = request.get_json()
@@ -431,7 +446,7 @@ def post_question(current_user):
 
     return jsonify({'message': 'Question has been posted'})
 
-@app.route('/questions/<questionId>', methods=['DELETE'])
+@app.route('/api/v1/questions/<questionId>', methods=['DELETE'])
 @token_required
 def delete_question1(current_user, questionId):
     question = Question.query.filter_by(qid = questionId).first()
@@ -444,6 +459,37 @@ def delete_question1(current_user, questionId):
 
     return jsonify({'message' : 'Question has been deleted'})
 
+@app.route('/api/v1/questions/<questionId>/answers', methods=['POST'])
+@token_required
+def post_answer(current_user, questionId):
+    data = request.get_json()
+
+    newanswer = Answer(question_tag = questionId, body = data['body'], date_posted = datetime.datetime.utcnow(), updated_at = datetime.datetime.utcnow(), answered_by = current_user.uid )
+    db.session.add(newanswer)
+    db.session.commit()
+
+    return jsonify({'message': 'Answer has been posted'})
+
+@app.route('/api/v1/questions/<questionId>/answers/<answerId>', methods=['PUT'])
+@token_required
+def accept_or_update_answer(current_user, questionId, answerId):
+    data = request.get_json()
+
+    answer = Answer.query.filter_by(aid = answerId).first()
+    question = Question.query.filter_by(qid = questionId).first()
+
+    if current_user.uid == answer.answered_by:
+        answer.body = data['body']
+        db.session.commit()
+
+        return jsonify({'message' : 'Answer has been updated'})
+    elif question.starter == current_user.uid:
+        answer.accepted = True
+        db.session.commit()
+
+        return jsonify({'message' : 'Answer has been accepted'})
+    else:
+        return jsonify({'message' : 'Only user who posted answer can update answer or user who posted question can accept answer'})
 
 
 if __name__ == "__main__":
